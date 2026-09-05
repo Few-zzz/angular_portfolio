@@ -14,3 +14,11 @@ html {
 body {
   background: #0f0f1e;
 }
+
+/* Matches the JS default (localStorage 'theme' still wins once Angular boots) so
+   the first paint doesn't flash dark before switching to a light system theme. */
+@media (prefers-color-scheme: light) {
+  body {
+    background: #f6f6fb;
+  }
+}

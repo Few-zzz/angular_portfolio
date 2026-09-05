@@ -16,6 +16,9 @@
   --text: #e5e7eb;
   --muted: #9ca3af;
   --card: rgba(255, 255, 255, 0.05);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.1);
+  --nav-bg: rgba(15, 15, 30, 0.8);
 
   display: block;
   font-family: 'Prompt', sans-serif;
@@ -23,6 +26,18 @@
   color: var(--text);
   line-height: 1.6;
   overflow-x: hidden;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+:host([data-theme='light']) {
+  --bg: #f6f6fb;
+  --bg2: #ffffff;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --card: rgba(15, 23, 42, 0.04);
+  --border: rgba(15, 23, 42, 0.1);
+  --border-strong: rgba(15, 23, 42, 0.14);
+  --nav-bg: rgba(255, 255, 255, 0.8);
 }
 
 :host * {
@@ -36,12 +51,13 @@ nav {
   right: 0;
   padding: 1rem 2rem;
   z-index: 100;
-  background: rgba(15, 15, 30, 0.8);
+  background: var(--nav-bg);
   backdrop-filter: blur(10px);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--border);
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 .logo {
   font-size: 1.5rem;
@@ -252,7 +268,7 @@ section {
   padding: 2rem;
   border-radius: 15px;
   text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   transition: 0.3s;
 }
 .skill-card:hover {
@@ -286,7 +302,7 @@ section {
   background: var(--card);
   border-radius: 15px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   transition: 0.3s;
 }
 .project-card:hover {
@@ -364,7 +380,7 @@ section {
   text-decoration: none;
   color: var(--text);
   transition: 0.3s;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-strong);
 }
 .social-link svg {
   width: 22px;
@@ -388,7 +404,7 @@ footer {
   text-align: center;
   padding: 2rem;
   color: var(--muted);
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--border);
   position: relative;
   z-index: 1;
 }
@@ -420,7 +436,7 @@ footer {
   background: var(--card);
   border-radius: 15px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
   transition: 0.3s;
   cursor: pointer;
 }
@@ -435,7 +451,7 @@ footer {
   object-fit: contain;
   background: #fff;
   padding: 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--border);
 }
 .cert-body {
   padding: 1.2rem;
@@ -559,4 +575,24 @@ footer {
 .lang-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+}
+
+.icon-btn {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  border: 1px solid var(--border-strong);
+  background: var(--card);
+  color: var(--text);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  transition: 0.3s;
+}
+.icon-btn:hover {
+  transform: translateY(-2px) rotate(15deg);
+  border-color: var(--accent);
+  color: var(--accent);
 }

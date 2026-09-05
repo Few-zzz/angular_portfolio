@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, QueryList, ViewChild, ViewChildren, inject, signal } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostBinding, HostListener, OnDestroy, QueryList, ViewChild, ViewChildren, inject, signal } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 interface Particle {
@@ -9,6 +9,13 @@ interface Particle {
   radius: number;
   color: string;
 }
+
+type Theme = 'dark' | 'light';
+
+const THEME_CANVAS = {
+  dark: { bg: '#0f0f1e', trail: 'rgba(15, 15, 30, 0.28)', composite: 'lighter' as GlobalCompositeOperation, alpha: 0.85, glow: 'rgba(99, 102, 241, 0.12)' },
+  light: { bg: '#f6f6fb', trail: 'rgba(246, 246, 251, 0.35)', composite: 'source-over' as GlobalCompositeOperation, alpha: 0.55, glow: 'rgba(99, 102, 241, 0.08)' }
+};
 
 interface Project {
   emoji?: string;
@@ -171,6 +178,13 @@ export class App implements AfterViewInit, OnDestroy {
 
   protected readonly lang = signal<Lang>((localStorage.getItem('lang') as Lang) || 'th');
 
+  protected readonly theme = signal<Theme>(this.getInitialTheme());
+
+  @HostBinding('attr.data-theme')
+  protected get themeAttr(): Theme {
+    return this.theme();
+  }
+
   private readonly sanitizer = inject(DomSanitizer);
 
   protected readonly modalImg = signal<string | null>(null);
@@ -262,7 +276,7 @@ export class App implements AfterViewInit, OnDestroy {
     this.spawnParticles();
 
     if (this.reduceMotion) {
-      this.ctx.fillStyle = '#0f0f1e';
+      this.ctx.fillStyle = THEME_CANVAS[this.theme()].bg;
       this.ctx.fillRect(0, 0, canvas.width, canvas.height);
       this.drawFrame(0);
       return;
@@ -335,15 +349,16 @@ export class App implements AfterViewInit, OnDestroy {
   private drawFrame(_dt: number): void {
     const canvas = this.canvasRef.nativeElement;
     const ctx = this.ctx;
+    const palette = THEME_CANVAS[this.theme()];
 
-    ctx.fillStyle = 'rgba(15, 15, 30, 0.28)';
+    ctx.fillStyle = palette.trail;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalCompositeOperation = palette.composite;
     for (const p of this.particles) {
       ctx.beginPath();
       ctx.fillStyle = p.color;
-      ctx.globalAlpha = 0.85;
+      ctx.globalAlpha = palette.alpha;
       ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
       ctx.fill();
     }
@@ -351,7 +366,7 @@ export class App implements AfterViewInit, OnDestroy {
 
     if (this.mouse.active) {
       const gradient = ctx.createRadialGradient(this.mouse.x, this.mouse.y, 0, this.mouse.x, this.mouse.y, 220);
-      gradient.addColorStop(0, 'rgba(99, 102, 241, 0.12)');
+      gradient.addColorStop(0, palette.glow);
       gradient.addColorStop(1, 'rgba(99, 102, 241, 0)');
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -368,6 +383,28 @@ export class App implements AfterViewInit, OnDestroy {
     const next: Lang = this.lang() === 'th' ? 'en' : 'th';
     this.lang.set(next);
     localStorage.setItem('lang', next);
+  }
+
+  protected toggleTheme(): void {
+    const next: Theme = this.theme() === 'dark' ? 'light' : 'dark';
+    this.theme.set(next);
+    localStorage.setItem('theme', next);
+
+    if (this.reduceMotion && this.ctx) {
+      const canvas = this.canvasRef.nativeElement;
+      this.ctx.fillStyle = THEME_CANVAS[next].bg;
+      this.ctx.fillRect(0, 0, canvas.width, canvas.height);
+      this.drawFrame(0);
+    }
+  }
+
+  private getInitialTheme(): Theme {
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark' || saved === 'light') return saved;
+    if (typeof matchMedia !== 'undefined' && matchMedia('(prefers-color-scheme: light)').matches) {
+      return 'light';
+    }
+    return 'dark';
   }
 
   protected openModal(cert: Certificate): void {

@@ -11,6 +11,11 @@
     <li><a href="#certificates">{{ t('nav.certificates') }}</a></li>
     <li><a href="#contact">{{ t('nav.contact') }}</a></li>
     <li>
+      <button class="icon-btn" title="Toggle dark / light mode" (click)="toggleTheme()">
+        <i class="fa-solid" [class.fa-moon]="theme() === 'dark'" [class.fa-sun]="theme() === 'light'"></i>
+      </button>
+    </li>
+    <li>
       <button class="lang-btn" title="Switch language" (click)="toggleLang()">
         <i class="fa-solid fa-globe"></i> <span>{{ lang() === 'th' ? 'EN' : 'TH' }}</span>
       </button>
