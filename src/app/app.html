@@ -117,6 +117,13 @@
         </svg>
         <h3>{{ s.name }}</h3>
         <p>{{ s.desc }}</p>
+        @if (s.logos.length) {
+          <div class="skill-logos">
+            @for (logo of s.logos; track logo) {
+              <span class="skill-logo"><img [src]="'logos/' + logo + '.svg'" [alt]="logo" loading="lazy" /></span>
+            }
+          </div>
+        }
       </div>
     }
   </div>

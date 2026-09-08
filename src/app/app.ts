@@ -46,6 +46,20 @@ const SKILL_ICONS: string[][] = [
   ['M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2', 'M9 2h6v4H9z', 'm9 14 2 2 4-4']
 ];
 
+/* Real brand marks (Simple Icons, CC0) for the specific tools named in each
+   skill card — index-aligned with SKILL_ICONS. Left empty where the tool has
+   no recognizable logo (FPGA/SoC, ISO 29110). */
+const SKILL_LOGOS: string[][] = [
+  ['html5', 'css3', 'javascript', 'react'],
+  ['nodejs', 'python', 'php', 'express'],
+  ['mysql', 'mongodb', 'postgresql', 'supabase'],
+  ['react', 'expo'],
+  ['espressif', 'arduino'],
+  [],
+  ['git', 'figma'],
+  []
+];
+
 const PROJECT_ICONS = {
   database: SKILL_ICONS[2],
   doc: ['M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z', 'M15 2v5h5', 'M8 12h8', 'M8 16h8'],
@@ -235,7 +249,7 @@ export class App implements AfterViewInit, OnDestroy {
   protected readonly education = computed(() => CONTENT[this.lang()].education);
 
   protected readonly skills = computed(() =>
-    CONTENT[this.lang()].skills.map(([name, desc], i) => ({ name, desc, icon: SKILL_ICONS[i] }))
+    CONTENT[this.lang()].skills.map(([name, desc], i) => ({ name, desc, icon: SKILL_ICONS[i], logos: SKILL_LOGOS[i] }))
   );
 
   protected readonly certificates = computed<Certificate[]>(() =>
