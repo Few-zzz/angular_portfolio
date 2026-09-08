@@ -341,6 +341,10 @@ figure { margin: 0; }
   text-decoration: none;
   background: transparent;
   transition: background 0.2s ease;
+  border: 0;
+  width: 100%;
+  cursor: pointer;
+  font: inherit;
 }
 .doc-link:hover { background: rgba(29, 45, 61, 0.12); }
 .doc-link span {
@@ -405,6 +409,19 @@ figure { margin: 0; }
 }
 .lightbox-plate img { max-width: 100%; max-height: 74vh; object-fit: contain; margin: 0 auto; }
 .lightbox-plate p { font-size: 13px; color: #5d5d60; text-align: center; }
+
+.pdf-lightbox { cursor: default; }
+.pdf-plate {
+  background: var(--paper);
+  padding: var(--sp-4);
+  width: min(1000px, 92vw);
+  height: 88vh;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+.pdf-plate iframe { flex: 1; width: 100%; border: 1px solid var(--line); background: #fff; }
+.pdf-plate .pdf-open-new { align-self: flex-end; }
 .lightbox-close {
   position: fixed;
   top: var(--sp-8);

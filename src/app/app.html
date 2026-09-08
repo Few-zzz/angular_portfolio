@@ -166,9 +166,9 @@
               </div>
             }
             @if (p.pdf) {
-              <a class="doc-link" [href]="p.pdf" target="_blank" rel="noopener" [title]="t('proj.openDoc')">
+              <button type="button" class="doc-link" (click)="openPdf(p)" [title]="t('proj.openDoc')">
                 <span>{{ t('proj.openDoc') }} ↗</span>
-              </a>
+              </button>
             }
           </div>
         </div>
@@ -217,6 +217,17 @@
       <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
     </div>
     <button type="button" class="lightbox-close" (click)="closeModal()">&times;</button>
+  </div>
+}
+
+@if (pdfEmbedUrl()) {
+  <div class="lightbox pdf-lightbox" (click)="$event.target === $event.currentTarget && closePdf()">
+    <div class="pdf-plate blueprint">
+      <iframe [src]="pdfEmbedUrl()" title="PDF Viewer"></iframe>
+      <a class="btn btn-secondary pdf-open-new" [href]="pdfViewUrl()" target="_blank" rel="noopener">{{ t('proj.openDoc') }} ↗</a>
+      <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+    </div>
+    <button type="button" class="lightbox-close" (click)="closePdf()">&times;</button>
   </div>
 }
 

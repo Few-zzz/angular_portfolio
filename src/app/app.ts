@@ -1,7 +1,8 @@
 import {
   AfterViewInit, Component, ElementRef, HostBinding, HostListener,
-  OnDestroy, ViewChild, computed, signal
+  OnDestroy, ViewChild, computed, inject, signal
 } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 type Theme = 'dark' | 'light';
 type Lang = 'th' | 'en';
@@ -206,6 +207,10 @@ export class App implements AfterViewInit, OnDestroy {
   protected readonly modalImg = signal<string | null>(null);
   protected readonly modalAlt = signal('');
 
+  private readonly sanitizer = inject(DomSanitizer);
+  protected readonly pdfEmbedUrl = signal<SafeResourceUrl | null>(null);
+  protected readonly pdfViewUrl = signal<string | null>(null);
+
   protected readonly projectCount = PROJECT_META.length;
 
   protected readonly channels = [
@@ -266,6 +271,35 @@ export class App implements AfterViewInit, OnDestroy {
 
   protected closeModal(): void { this.modalImg.set(null); }
 
+  protected openPdf(project: Project): void {
+    if (!project.pdf) return;
+    this.pdfEmbedUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(this.toEmbedUrl(project.pdf)));
+    this.pdfViewUrl.set(this.toViewUrl(project.pdf));
+    document.body.style.overflow = 'hidden';
+  }
+
+  protected closePdf(): void {
+    this.pdfEmbedUrl.set(null);
+    this.pdfViewUrl.set(null);
+    document.body.style.overflow = '';
+  }
+
+  private toEmbedUrl(url: string): string {
+    let m = url.match(/drive\.google\.com\/file\/d\/([^/]+)/);
+    if (m) return `https://drive.google.com/file/d/${m[1]}/preview`;
+    m = url.match(/drive\.google\.com\/open\?id=([^&]+)/);
+    if (m) return `https://drive.google.com/file/d/${m[1]}/preview`;
+    m = url.match(/docs\.google\.com\/(document|presentation|spreadsheets)\/d\/([^/]+)/);
+    if (m) return `https://docs.google.com/${m[1]}/d/${m[2]}/preview`;
+    return url;
+  }
+
+  private toViewUrl(url: string): string {
+    const m = url.match(/drive\.google\.com\/file\/d\/([^/]+)/) || url.match(/drive\.google\.com\/open\?id=([^&]+)/);
+    if (m) return `https://drive.google.com/file/d/${m[1]}/view`;
+    return url;
+  }
+
   protected toggleTheme(): void {
     const next: Theme = this.theme() === 'dark' ? 'light' : 'dark';
     this.theme.set(next);
@@ -280,7 +314,10 @@ export class App implements AfterViewInit, OnDestroy {
   }
 
   @HostListener('document:keydown.escape')
-  protected onEscape(): void { this.closeModal(); }
+  protected onEscape(): void {
+    this.closeModal();
+    this.closePdf();
+  }
 
   /* ── particle background ───────────────────────────────────────── */
   private ctx!: CanvasRenderingContext2D;
