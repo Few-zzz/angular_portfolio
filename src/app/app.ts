@@ -194,6 +194,9 @@ const CONTENT = {
 
 const STAT_VALUES = ['7', '8', '4', 'TH / EN'];
 
+const PROFILE_PHOTOS = ['profile.png', 'profile2.jpg'];
+const PROFILE_SLIDE_MS = 4500;
+
 @Component({
   selector: 'app-root',
   imports: [],
@@ -237,6 +240,10 @@ export class App implements AfterViewInit, OnDestroy {
   ];
 
   protected readonly themeIcon = computed(() => (this.theme() === 'dark' ? SUN : MOON));
+
+  protected readonly profilePhotos = PROFILE_PHOTOS;
+  protected readonly profileIndex = signal(0);
+  private profileTimer = 0;
 
   protected readonly stats = computed(() =>
     CONTENT[this.lang()].stats.map((label, i) => ({ label, value: STAT_VALUES[i] }))
@@ -341,9 +348,30 @@ export class App implements AfterViewInit, OnDestroy {
   private readonly reduceMotion =
     typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  ngAfterViewInit(): void { this.initBackground(); }
+  ngAfterViewInit(): void {
+    this.initBackground();
+    this.startProfileSlideshow();
+  }
 
-  ngOnDestroy(): void { cancelAnimationFrame(this.rafId); }
+  ngOnDestroy(): void {
+    cancelAnimationFrame(this.rafId);
+    clearInterval(this.profileTimer);
+  }
+
+  private startProfileSlideshow(): void {
+    if (this.profilePhotos.length < 2 || this.reduceMotion) return;
+    this.profileTimer = window.setInterval(() => {
+      this.profileIndex.update((i) => (i + 1) % this.profilePhotos.length);
+    }, PROFILE_SLIDE_MS);
+  }
+
+  protected setProfilePhoto(i: number): void {
+    this.profileIndex.set(i);
+    if (this.profileTimer) {
+      clearInterval(this.profileTimer);
+      this.startProfileSlideshow();
+    }
+  }
 
   @HostListener('window:mousemove', ['$event'])
   protected onMouseMove(event: MouseEvent): void {

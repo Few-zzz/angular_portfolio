@@ -60,7 +60,22 @@
       </div>
     </div>
     <figure class="photo blueprint">
-      <img src="profile.png" alt="Wongsakon Sritongted" />
+      @for (src of profilePhotos; track src; let i = $index) {
+        <img [src]="src" alt="Wongsakon Sritongted" [class.active]="i === profileIndex()" />
+      }
+      @if (profilePhotos.length > 1) {
+        <div class="photo-dots">
+          @for (src of profilePhotos; track src; let i = $index) {
+            <button
+              type="button"
+              class="photo-dot"
+              [class.active]="i === profileIndex()"
+              [attr.aria-label]="'Photo ' + (i + 1)"
+              (click)="setProfilePhoto(i)"
+            ></button>
+          }
+        </div>
+      }
       <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
     </figure>
   </div>
@@ -120,7 +135,9 @@
         @if (s.logos.length) {
           <div class="skill-logos">
             @for (logo of s.logos; track logo) {
-              <span class="skill-logo"><img [src]="'logos/' + logo + '.svg'" [alt]="logo" loading="lazy" /></span>
+              <span class="skill-logo" [class.on-dark]="logo === 'express' || logo === 'expo'">
+                <img [src]="'logos/' + logo + '.svg'" [alt]="logo" loading="lazy" />
+              </span>
             }
           </div>
         }
