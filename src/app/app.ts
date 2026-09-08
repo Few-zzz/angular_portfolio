@@ -135,7 +135,7 @@ const CONTENT = {
       ['Frontend', 'HTML, CSS, JavaScript, React'], ['Backend', 'Node.js, Python, PHP, Express'],
       ['Database', 'MySQL, MongoDB, PostgreSQL, Supabase'], ['Mobile', 'React Native, Expo'],
       ['IoT & Hardware', 'ESP32, Arduino, ออกแบบเซ็นเซอร์'], ['FPGA / SoC', 'Xilinx, VHDL, Verilog, CPU 8-bit'],
-      ['เครื่องมือ', 'Git, VS Code, Figma, Xilinx ISE'], ['มาตรฐาน', 'การจัดทำเอกสาร ISO 29110']
+      ['เครื่องมือ', 'Git, VS Code, Figma, Xilinx ISE, Wecon PLC Editor, PIStudio'], ['มาตรฐาน', 'การจัดทำเอกสาร ISO 29110']
     ],
     projects: [
       { title: 'Application V-Fresh', desc: 'แอปพลิเคชันสำหรับสั่งซื้อผักผลไม้สดจากฟาร์มถึงบ้านเพื่อเกษตรกร', role: 'ทำหน้าแอปฝั่งของ Seller และระบบ Live โดย Agora พร้อมจัดการ Database ด้วย Supabase' },
@@ -168,7 +168,7 @@ const CONTENT = {
       ['Frontend', 'HTML, CSS, JavaScript, React'], ['Backend', 'Node.js, Python, PHP, Express'],
       ['Database', 'MySQL, MongoDB, PostgreSQL, Supabase'], ['Mobile', 'React Native, Expo'],
       ['IoT & Hardware', 'ESP32, Arduino, Sensor Design'], ['FPGA / SoC', 'Xilinx, VHDL, Verilog, CPU 8-bit'],
-      ['Tools', 'Git, VS Code, Figma, Xilinx ISE'], ['Standard', 'ISO 29110 Document Management']
+      ['Tools', 'Git, VS Code, Figma, Xilinx ISE, Wecon PLC Editor, PIStudio'], ['Standard', 'ISO 29110 Document Management']
     ],
     projects: [
       { title: 'V-Fresh Application', desc: 'Mobile app for ordering fresh produce from farm to home, supporting local farmers', role: 'Developed the Seller-side interface and Live streaming feature with Agora, managed Database with Supabase' },
