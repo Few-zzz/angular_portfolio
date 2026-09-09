@@ -76,7 +76,7 @@ const PROJECT_META = [
   { no: 'PRJ 07', kind: 'Network Research', icon: PROJECT_ICONS.network, pdf: 'https://drive.google.com/file/d/1fjkqMTIZZQc9PaTKvGWuKdNiFa65fEhf/view?usp=sharing', tags: ['Network', 'Active-Active', 'High Availability', 'SA'] }
 ];
 
-const CERT_IMAGES = ['cert-aws.png', 'cert-teacher.png', 'cert-aws-full.png', 'cert-research.png', 'cert-datascience.png', 'cert-cloudbased.png', 'cert-logistics.png', 'cert-business.png'];
+const CERT_IMAGES = ['HCIA-IoT V3.0 Course.png', 'cert-aws.png', 'cert-teacher.png', 'cert-aws-full.png', 'cert-research.png', 'cert-datascience.png', 'cert-cloudbased.png', 'cert-logistics.png', 'cert-business.png'];
 
 const COPY = {
   th: {
@@ -147,6 +147,7 @@ const CONTENT = {
       { title: 'วิจัยการออกแบบ Network Active-Active', desc: 'งานวิจัยการออกแบบระบบเครือข่ายแบบ Active-Active เพื่อเพิ่มความพร้อมใช้งาน (High Availability) และกระจายโหลดอย่างมีประสิทธิภาพ', role: 'System Analyst (SA) ออกแบบ Diagram ของระบบ' }
     ],
     certificates: [
+      { title: 'HCIA-IoT V3.0 Course', org: 'Huawei ICT Academy', date: '9 ก.ย. 2026' },
       { title: 'AWS Academy - Machine Learning Foundations', org: 'AWS Academy (20 ชั่วโมง)', date: '16 ก.พ. 2026' },
       { title: 'Data Science (45 ชั่วโมง)', org: 'Thai MOOC - มหาวิทยาลัยศรีนครินทรวิโรฒ', date: '6 มี.ค. 2026' },
       { title: 'การใช้เทคโนโลยีเพื่อพัฒนาการวิจัย', org: 'Thai MOOC - มหาวิทยาลัยศรีนครินทรวิโรฒ (6 ชั่วโมง)', date: '6 มี.ค. 2026' },
@@ -180,6 +181,7 @@ const CONTENT = {
       { title: 'Active-Active Network Design Research', desc: 'Research on designing Active-Active network architecture to improve high availability and efficiently distribute load', role: 'System Analyst (SA) — designed the system diagram' }
     ],
     certificates: [
+      { title: 'HCIA-IoT V3.0 Course', org: 'Huawei ICT Academy', date: 'Sep 9, 2026' },
       { title: 'AWS Academy - Machine Learning Foundations', org: 'AWS Academy (20 Hours)', date: 'Feb 16, 2026' },
       { title: 'Data Science (45 Hours)', org: 'Thai MOOC - Srinakharinwirot University', date: 'Mar 6, 2026' },
       { title: 'Use of Technology for Research Development', org: 'Thai MOOC - Srinakharinwirot University (6 Hours)', date: 'Mar 6, 2026' },
@@ -192,7 +194,10 @@ const CONTENT = {
   }
 };
 
-const STAT_VALUES = ['7', '8', '4', 'TH / EN'];
+/* Projects/certificates counts are derived from PROJECT_META/CERT_IMAGES
+   below so this never needs a manual update — only "years of study" and
+   "languages" are fixed facts, not list lengths. */
+const STAT_VALUES = [String(PROJECT_META.length), String(CERT_IMAGES.length), '4', 'TH / EN'];
 
 const PROFILE_PHOTOS = ['profile.png', 'profile2.jpg'];
 const PROFILE_SLIDE_MS = 4500;
