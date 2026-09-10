@@ -214,6 +214,8 @@ const PROFILE_SLIDE_MS = 4500;
 
 const GITHUB_USER = 'Few-zzz';
 const GITHUB_REPO_LIMIT = 6;
+const GITHUB_CACHE_KEY = 'gh-cache-v1';
+const GITHUB_CACHE_MS = 5 * 60 * 1000; // reuse a successful response for 5 minutes
 
 interface Repo {
   name: string;
@@ -405,9 +407,18 @@ export class App implements AfterViewInit, OnDestroy {
   }
 
   /* Unauthenticated GitHub API — two parallel requests per visitor from
-     their own IP, well under the 60/hr limit. Any failure flips the section
-     to its error state; the rest of the page is untouched. */
+     their own IP, well under the 60/hr limit. A successful response is
+     cached in localStorage for 5 minutes so refreshes/return visits don't
+     re-hit the API. Any failure falls back to a stale cache if there is
+     one, otherwise flips the section to its error state; the rest of the
+     page is untouched either way. */
   private async loadGithub(): Promise<void> {
+    const cached = this.readGithubCache();
+    if (cached && Date.now() - cached.ts < GITHUB_CACHE_MS) {
+      this.applyGithub(cached.profile, cached.repos);
+      return;
+    }
+
     const headers = { Accept: 'application/vnd.github+json' };
     try {
       const [profileRes, reposRes] = await Promise.all([
@@ -421,7 +432,7 @@ export class App implements AfterViewInit, OnDestroy {
       const totalStars = raw.reduce((sum, r) => sum + Number(r['stargazers_count'] ?? 0), 0);
 
       const p = (await profileRes.json()) as Record<string, unknown>;
-      this.profile.set({
+      const profile: GhProfile = {
         name: (p['name'] as string) || String(p['login']),
         login: String(p['login']),
         avatar: String(p['avatar_url']),
@@ -430,20 +441,43 @@ export class App implements AfterViewInit, OnDestroy {
         followers: Number(p['followers'] ?? 0),
         since: new Date(String(p['created_at'])).getFullYear(),
         totalStars
-      });
+      };
+      const repos: Repo[] = active.slice(0, GITHUB_REPO_LIMIT).map((r) => ({
+        name: String(r['name']),
+        description: (r['description'] as string) ?? '',
+        language: (r['language'] as string) ?? null,
+        stars: Number(r['stargazers_count'] ?? 0),
+        url: String(r['html_url'])
+      }));
 
-      this.repos.set(
-        active.slice(0, GITHUB_REPO_LIMIT).map((r) => ({
-          name: String(r['name']),
-          description: (r['description'] as string) ?? '',
-          language: (r['language'] as string) ?? null,
-          stars: Number(r['stargazers_count'] ?? 0),
-          url: String(r['html_url'])
-        }))
-      );
-      this.reposState.set('ready');
+      this.applyGithub(profile, repos);
+      this.writeGithubCache(profile, repos);
     } catch {
-      this.reposState.set('error');
+      if (cached) this.applyGithub(cached.profile, cached.repos);
+      else this.reposState.set('error');
+    }
+  }
+
+  private applyGithub(profile: GhProfile, repos: Repo[]): void {
+    this.profile.set(profile);
+    this.repos.set(repos);
+    this.reposState.set('ready');
+  }
+
+  private readGithubCache(): { ts: number; profile: GhProfile; repos: Repo[] } | null {
+    try {
+      const raw = localStorage.getItem(GITHUB_CACHE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  private writeGithubCache(profile: GhProfile, repos: Repo[]): void {
+    try {
+      localStorage.setItem(GITHUB_CACHE_KEY, JSON.stringify({ ts: Date.now(), profile, repos }));
+    } catch {
+      /* private mode or quota — cache is best-effort */
     }
   }
 
