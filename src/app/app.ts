@@ -81,7 +81,12 @@ const CERT_IMAGES = ['HCIA-IoT V3.0 Course.png', 'cert-aws.png', 'cert-teacher.p
 const COPY = {
   th: {
     'nav.about': 'เกี่ยวกับ', 'nav.education': 'การศึกษา', 'nav.skills': 'ทักษะ',
-    'nav.projects': 'ผลงาน', 'nav.certificates': 'เกียรติบัตร', 'nav.contact': 'ติดต่อ',
+    'nav.projects': 'ผลงาน', 'nav.certificates': 'เกียรติบัตร', 'nav.github': 'GitHub', 'nav.contact': 'ติดต่อ',
+    'gh.title': 'GitHub', 'gh.kicker': 'อัปเดตสดจาก GitHub API',
+    'gh.loading': 'กำลังโหลดข้อมูลจาก GitHub…',
+    'gh.error': 'ตอนนี้ดึงข้อมูลจาก GitHub ไม่ได้ — ดูโดยตรงได้ที่',
+    'gh.viewAll': 'ดูทั้งหมดบน GitHub ↗', 'gh.noDesc': 'ไม่มีคำอธิบาย',
+    'gh.repos': 'repository', 'gh.followers': 'ผู้ติดตาม', 'gh.stars': 'ดาวรวม', 'gh.since': 'อยู่บน GitHub ตั้งแต่',
     'hero.kicker': 'Portfolio / 2026 — มหาวิทยาลัยศรีปทุม',
     'hero.name': 'วงศกร ศรีทองเทศ',
     'hero.desc': 'นักศึกษาวิศวกรรมคอมพิวเตอร์ พัฒนาเว็บ โมบายแอป และระบบ IoT ตั้งแต่ระดับฮาร์ดแวร์ ESP32 และ FPGA ไปจนถึงฐานข้อมูลและหน้าใช้งานจริง',
@@ -102,7 +107,12 @@ const COPY = {
   },
   en: {
     'nav.about': 'About', 'nav.education': 'Education', 'nav.skills': 'Skills',
-    'nav.projects': 'Projects', 'nav.certificates': 'Certificates', 'nav.contact': 'Contact',
+    'nav.projects': 'Projects', 'nav.certificates': 'Certificates', 'nav.github': 'GitHub', 'nav.contact': 'Contact',
+    'gh.title': 'GitHub', 'gh.kicker': 'Live from the GitHub API',
+    'gh.loading': 'Loading from GitHub…',
+    'gh.error': "Can't reach GitHub right now — browse directly at",
+    'gh.viewAll': 'View all on GitHub ↗', 'gh.noDesc': 'No description',
+    'gh.repos': 'repositories', 'gh.followers': 'followers', 'gh.stars': 'total stars', 'gh.since': 'on GitHub since',
     'hero.kicker': 'Portfolio / 2026 — Sripatum University',
     'hero.name': 'Wongsakon Sritongted',
     'hero.desc': 'Computer Engineering student building web, mobile and IoT systems — from ESP32 and FPGA hardware up to databases and the interfaces on top of them.',
@@ -202,6 +212,36 @@ const STAT_VALUES = [String(PROJECT_META.length), String(CERT_IMAGES.length), '4
 const PROFILE_PHOTOS = ['profile.png', 'profile2.jpg'];
 const PROFILE_SLIDE_MS = 4500;
 
+const GITHUB_USER = 'Few-zzz';
+const GITHUB_REPO_LIMIT = 6;
+
+interface Repo {
+  name: string;
+  description: string;
+  language: string | null;
+  stars: number;
+  url: string;
+}
+
+interface GhProfile {
+  name: string;
+  login: string;
+  avatar: string;
+  url: string;
+  publicRepos: number;
+  followers: number;
+  since: number;
+  totalStars: number;
+}
+
+/* GitHub's own brand colors for the languages that actually show up in
+   these repos — falls back to the steel accent for anything else. */
+const LANG_COLOR: Record<string, string> = {
+  TypeScript: '#3178c6', JavaScript: '#f1e05a', HTML: '#e34c26', CSS: '#563d7c',
+  'C++': '#f34b7d', C: '#555555', Python: '#3572A5', 'C#': '#178600', Vue: '#41b883',
+  Dart: '#00B4AB', Shell: '#89e051', Java: '#b07219', Verilog: '#b2b7f8', VHDL: '#adb2cb'
+};
+
 @Component({
   selector: 'app-root',
   imports: [],
@@ -234,6 +274,11 @@ export class App implements AfterViewInit, OnDestroy {
   protected readonly pdfViewUrl = signal<string | null>(null);
 
   protected readonly projectCount = PROJECT_META.length;
+
+  protected readonly githubUrl = `https://github.com/${GITHUB_USER}`;
+  protected readonly repos = signal<Repo[]>([]);
+  protected readonly profile = signal<GhProfile | null>(null);
+  protected readonly reposState = signal<'loading' | 'ready' | 'error'>('loading');
 
   protected readonly channels = [
     { k: 'Email', v: 'wongsakon20172547@gmail.com', href: 'mailto:wongsakon20172547@gmail.com' },
@@ -356,7 +401,56 @@ export class App implements AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this.initBackground();
     this.startProfileSlideshow();
+    this.loadGithub();
   }
+
+  /* Unauthenticated GitHub API — two parallel requests per visitor from
+     their own IP, well under the 60/hr limit. Any failure flips the section
+     to its error state; the rest of the page is untouched. */
+  private async loadGithub(): Promise<void> {
+    const headers = { Accept: 'application/vnd.github+json' };
+    try {
+      const [profileRes, reposRes] = await Promise.all([
+        fetch(`https://api.github.com/users/${GITHUB_USER}`, { headers }),
+        fetch(`https://api.github.com/users/${GITHUB_USER}/repos?sort=pushed&per_page=100`, { headers })
+      ]);
+      if (!profileRes.ok || !reposRes.ok) throw new Error('GitHub request failed');
+
+      const raw = (await reposRes.json()) as Array<Record<string, unknown>>;
+      const active = raw.filter((r) => !r['fork'] && !r['archived']);
+      const totalStars = raw.reduce((sum, r) => sum + Number(r['stargazers_count'] ?? 0), 0);
+
+      const p = (await profileRes.json()) as Record<string, unknown>;
+      this.profile.set({
+        name: (p['name'] as string) || String(p['login']),
+        login: String(p['login']),
+        avatar: String(p['avatar_url']),
+        url: String(p['html_url']),
+        publicRepos: Number(p['public_repos'] ?? 0),
+        followers: Number(p['followers'] ?? 0),
+        since: new Date(String(p['created_at'])).getFullYear(),
+        totalStars
+      });
+
+      this.repos.set(
+        active.slice(0, GITHUB_REPO_LIMIT).map((r) => ({
+          name: String(r['name']),
+          description: (r['description'] as string) ?? '',
+          language: (r['language'] as string) ?? null,
+          stars: Number(r['stargazers_count'] ?? 0),
+          url: String(r['html_url'])
+        }))
+      );
+      this.reposState.set('ready');
+    } catch {
+      this.reposState.set('error');
+    }
+  }
+
+  protected langColor(language: string | null): string {
+    return (language && LANG_COLOR[language]) || 'var(--accent)';
+  }
+
 
   ngOnDestroy(): void {
     cancelAnimationFrame(this.rafId);

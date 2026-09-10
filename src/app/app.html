@@ -12,6 +12,7 @@
       <a href="#skills">{{ t('nav.skills') }}</a>
       <a href="#projects">{{ t('nav.projects') }}</a>
       <a href="#certificates">{{ t('nav.certificates') }}</a>
+      <a href="#github">{{ t('nav.github') }}</a>
 
       <button type="button" class="btn btn-secondary btn-icon" title="Toggle dark / light mode" (click)="toggleTheme()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -231,6 +232,61 @@
       </figure>
     }
   </div>
+</section>
+
+<section class="sec" id="github">
+  <p class="kicker">{{ t('gh.kicker') }}</p>
+  <h2 class="sec-title">{{ t('gh.title') }}</h2>
+
+  @switch (reposState()) {
+    @case ('loading') {
+      <p class="empty">{{ t('gh.loading') }}</p>
+    }
+    @case ('error') {
+      <p class="empty">{{ t('gh.error') }} <a [href]="githubUrl" target="_blank" rel="noopener">{{ githubUrl }}</a></p>
+    }
+    @case ('ready') {
+      @if (profile(); as p) {
+        <a class="gh-profile blueprint" [href]="p.url" target="_blank" rel="noopener">
+          <img class="gh-avatar" [src]="p.avatar" [alt]="p.name" width="72" height="72" />
+          <div class="gh-id">
+            <span class="gh-name">{{ p.name }}</span>
+            <span class="gh-login">&#64;{{ p.login }}</span>
+            <span class="gh-since">{{ t('gh.since') }} {{ p.since }}</span>
+          </div>
+          <dl class="gh-stats">
+            <div><dt>{{ p.publicRepos }}</dt><dd>{{ t('gh.repos') }}</dd></div>
+            <div><dt>{{ p.followers }}</dt><dd>{{ t('gh.followers') }}</dd></div>
+            <div><dt>{{ p.totalStars }}</dt><dd>{{ t('gh.stars') }}</dd></div>
+          </dl>
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        </a>
+      }
+      <div class="repo-grid">
+        @for (r of repos(); track r.name) {
+          <a class="repo blueprint" [href]="r.url" target="_blank" rel="noopener">
+            <div class="repo-head">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.9a3.4 3.4 0 0 0-1-2.6c3-.3 6.2-1.5 6.2-6.7A5.2 5.2 0 0 0 20 4.8a4.8 4.8 0 0 0-.1-3.6s-1.1-.3-3.6 1.4a12.4 12.4 0 0 0-6.6 0C7.2.9 6.1 1.2 6.1 1.2A4.8 4.8 0 0 0 6 4.8a5.2 5.2 0 0 0-1.4 3.6c0 5.2 3.2 6.4 6.2 6.7a3.4 3.4 0 0 0-1 2.6V22" />
+              </svg>
+              <span class="repo-name">{{ r.name }}</span>
+            </div>
+            <p class="repo-desc">{{ r.description || t('gh.noDesc') }}</p>
+            <div class="repo-meta">
+              @if (r.language) {
+                <span class="repo-lang"><i [style.background]="langColor(r.language)"></i>{{ r.language }}</span>
+              }
+              @if (r.stars) {
+                <span class="repo-stars">★ {{ r.stars }}</span>
+              }
+            </div>
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          </a>
+        }
+      </div>
+      <a class="btn btn-secondary repo-all" [href]="githubUrl" target="_blank" rel="noopener">{{ t('gh.viewAll') }}</a>
+    }
+  }
 </section>
 
 @if (modalImg()) {

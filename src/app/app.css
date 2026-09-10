@@ -400,6 +400,58 @@ figure { margin: 0; }
 .proj-role .label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
 .tags { display: flex; gap: var(--sp-2); flex-wrap: wrap; }
 
+/* github */
+.gh-profile {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--sp-6) var(--sp-8);
+  padding: var(--sp-6);
+  margin-bottom: 34px;
+  text-decoration: none;
+  color: inherit;
+  background: var(--surface);
+  transition: border-color 0.2s ease;
+}
+.gh-profile:hover { border-color: var(--accent); }
+.gh-avatar { width: 72px; height: 72px; object-fit: cover; border: 1px solid var(--line); }
+.gh-id { display: flex; flex-direction: column; gap: 3px; }
+.gh-name { font-family: var(--font-heading); font-weight: 600; font-size: 20px; }
+.gh-login { font-size: 13px; color: var(--accent-ink); }
+.gh-since { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); margin-top: 3px; }
+.gh-stats { display: flex; gap: var(--sp-8); margin: 0 0 0 auto; }
+.gh-stats dt { font-family: var(--font-heading); font-weight: 600; font-size: 24px; line-height: 1; }
+.gh-stats dd { margin: 4px 0 0; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
+
+.repo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 34px var(--sp-8); }
+.repo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-6);
+  text-decoration: none;
+  color: inherit;
+  background: var(--surface);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.repo:hover { border-color: var(--accent); transform: translateY(-2px); }
+.repo-head { display: flex; align-items: center; gap: var(--sp-2); }
+.repo-head svg { width: 16px; height: 16px; color: var(--ink-3); flex-shrink: 0; }
+.repo-name { font-family: var(--font-heading); font-weight: 600; font-size: 17px; letter-spacing: 0.01em; }
+.repo-desc { font-size: 13px; color: var(--ink-3); flex: 1; }
+.repo-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2) var(--sp-4);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+.repo-lang { display: inline-flex; align-items: center; gap: 5px; }
+.repo-lang i { width: 8px; height: 8px; border-radius: 50%; display: block; }
+.repo-all { margin-top: 34px; }
+
 /* certificates */
 .cert-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--sp-12) 34px; }
 .cert { display: flex; flex-direction: column; gap: var(--sp-4); }
