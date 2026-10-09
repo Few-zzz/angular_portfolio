@@ -341,7 +341,7 @@
         <button type="submit" class="btn field-btn send-btn" [disabled]="contactState() === 'sending'">
           {{ contactState() === 'sending' ? t('contact.sending') : t('contact.send') }}
         </button>
-        <a class="btn field-btn resume-btn" [href]="resumeUrl" target="_blank" rel="noopener">
+        <a class="btn field-btn resume-btn" [href]="resumeUrl()" [attr.download]="'Wongsakon-Sritongted-Resume-' + lang().toUpperCase() + '.pdf'">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M15 2v5h5" /><path d="M12 11v6" /><path d="m9 14 3 3 3-3" />
           </svg>

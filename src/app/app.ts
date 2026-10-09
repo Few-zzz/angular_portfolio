@@ -221,8 +221,8 @@ const LANG_COLOR: Record<string, string> = {
 };
 
 const CONTACT_EMAIL = 'wongsakon20172547@gmail.com';
-/* Drop the PDF into public/ under this name (or swap in a Drive link). */
-const RESUME_URL = 'resume.pdf';
+/* public/resume-th.pdf and public/resume-en.pdf — picked by the current language. */
+const RESUME_FILE: Record<Lang, string> = { th: 'resume-th.pdf', en: 'resume-en.pdf' };
 /* Web3Forms public access key — safe to ship in client code; it can only
    deliver submissions to the inbox registered on web3forms.com. */
 const WEB3FORMS_KEY = 'b4e5dcdf-2835-4670-9b80-3bd73e3de513';
@@ -280,7 +280,7 @@ export class App implements AfterViewInit, OnDestroy {
   protected readonly profile = signal<GhProfile | null>(null);
   protected readonly reposState = signal<'loading' | 'ready' | 'error'>('loading');
 
-  protected readonly resumeUrl = RESUME_URL;
+  protected readonly resumeUrl = computed(() => RESUME_FILE[this.lang()]);
 
   protected readonly contactItems = computed(() => [
     { label: this.t('contact.email'), v: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}`, icon: CONTACT_ICONS.mail },
