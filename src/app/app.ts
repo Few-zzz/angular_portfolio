@@ -122,7 +122,7 @@ const COPY = {
 const CONTENT = {
   th: {
     stats: ['โปรเจกต์', 'เกียรติบัตร', 'ปีที่ศึกษา', 'ภาษา'],
-    specs: [['สาขา', 'วิศวกรรมคอมพิวเตอร์'], ['สถาบัน', 'มหาวิทยาลัยศรีปทุม'], ['เบอร์โทร', '063-3130850'], ['ภาษา', 'ไทย, อังกฤษ']],
+    specs: [['สาขา', 'วิศวกรรมคอมพิวเตอร์'], ['สถาบัน', 'มหาวิทยาลัยศรีปทุม'], ['เบอร์โทร', '063-3138150'], ['ภาษา', 'ไทย, อังกฤษ']],
     education: [
       { school: 'มหาวิทยาลัยศรีปทุม', degree: 'ปริญญาตรี คณะเทคโนโลยี', major: 'สาขาวิศวกรรมคอมพิวเตอร์', year: '2023 - ปัจจุบัน' },
       { school: 'โรงเรียนดรุณาราชบุรี', degree: 'มัธยมศึกษาตอนปลาย', major: 'แผนการเรียน วิทย์ - คณิต', year: '2020 - 2022' }
@@ -151,7 +151,7 @@ const CONTENT = {
   },
   en: {
     stats: ['Projects', 'Certificates', 'Years of study', 'Languages'],
-    specs: [['Major', 'Computer Engineering'], ['Institution', 'Sripatum University'], ['Phone', '063-3130850'], ['Languages', 'Thai, English']],
+    specs: [['Major', 'Computer Engineering'], ['Institution', 'Sripatum University'], ['Phone', '063-3138150'], ['Languages', 'Thai, English']],
     education: [
       { school: 'Sripatum University', degree: "Bachelor's Degree, School of Technology", major: 'Computer Engineering', year: '2023 - Present' },
       { school: 'Darunaratchaburi School', degree: 'High School', major: 'Science - Mathematics Program', year: '2020 - 2022' }
@@ -284,7 +284,7 @@ export class App implements AfterViewInit, OnDestroy {
 
   protected readonly contactItems = computed(() => [
     { label: this.t('contact.email'), v: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}`, icon: CONTACT_ICONS.mail },
-    { label: this.t('contact.phone'), v: '063-313-0850', href: 'tel:+66633130850', icon: CONTACT_ICONS.phone },
+    { label: this.t('contact.phone'), v: '063-313-8150', href: 'tel:+66633138150', icon: CONTACT_ICONS.phone },
     { label: this.t('contact.location'), v: this.t('contact.locationValue'), href: '', icon: CONTACT_ICONS.pin }
   ]);
 
