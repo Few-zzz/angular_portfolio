@@ -1,0 +1,82 @@
+<div class="tk" [class.th]="lang() === 'th'">
+  <div class="tk-head">
+    <p class="tk-kicker">{{ copy().kicker }}</p>
+    <h2 class="tk-title">
+      {{ copy().title1 }}<br /><span>{{ copy().title2 }}</span>
+    </h2>
+    <p class="tk-sub">{{ copy().sub }}</p>
+    <p class="tk-meta">{{ copy().meta }} · {{ keys.length }} {{ copy().tools }} · 7 × 4</p>
+    <p class="tk-hint">{{ copy().hint }}</p>
+  </div>
+
+  <article class="tk-card" [style.--c]="shown().color" aria-live="polite">
+    <header class="tk-card-head">
+      <span class="tk-cat"><i></i>{{ catName()[shown().cat] }}</span>
+      <kbd>{{ shown().key }}</kbd>
+    </header>
+    <h3>{{ shown().name }}</h3>
+    <p class="tk-desc">{{ lang() === 'th' ? shown().th : shown().en }}</p>
+    @if (usedIn().length) {
+      <div class="tk-used">
+        <span class="tk-label">{{ copy().usedIn }}</span>
+        @for (p of usedIn(); track p.no) {
+          <a class="tk-chip" href="#projects">{{ p.no }} · {{ p.title }}</a>
+        }
+      </div>
+    }
+    <footer class="tk-card-foot">
+      <span class="tk-label">{{ copy().how }} {{ shown().key }}</span>
+      <div class="tk-legend">
+        @for (c of cats; track c) {
+          <button
+            type="button"
+            [style.--c]="catColor[c]"
+            [class.on]="focusCat() === c"
+            (pointerenter)="focusCat.set(c)"
+            (pointerleave)="focusCat.set(null)"
+            (focus)="focusCat.set(c)"
+            (blur)="focusCat.set(null)"
+          >
+            <i></i>{{ catName()[c] }}
+          </button>
+        }
+      </div>
+    </footer>
+  </article>
+
+  <div class="tk-stage" (pointermove)="onTilt($event)" (pointerleave)="resetTilt()">
+    <div class="tk-board" [style.--tx.deg]="tilt().x" [style.--ty.deg]="tilt().y">
+      @for (k of keys; track k.id) {
+        <button
+          type="button"
+          class="cap"
+          [style.--c]="k.color"
+          [style.--logo]="k.logoUrl"
+          [class.on]="shown().id === k.id"
+          [class.down]="pressed() === k.id"
+          [class.dim]="focusCat() !== null && focusCat() !== k.cat"
+          [attr.aria-label]="k.name + ' (' + k.key + ')'"
+          [attr.aria-pressed]="selected() === k.id"
+          (pointerenter)="hovered.set(k.id)"
+          (pointerleave)="hovered.set(null)"
+          (focus)="hovered.set(k.id)"
+          (blur)="hovered.set(null)"
+          (click)="press(k.id)"
+        >
+          <span class="cap-front"></span>
+          <span class="cap-right"></span>
+          <span class="cap-top">
+            <span class="cap-key">{{ k.key }}</span>
+            @if (k.logo) {
+              <i class="cap-logo"></i>
+            } @else {
+              <b class="cap-text">{{ k.text }}</b>
+            }
+          </span>
+        </button>
+      }
+      <span class="plate-front"></span>
+      <span class="plate-right"></span>
+    </div>
+  </div>
+</div>

@@ -3,6 +3,7 @@ import {
   OnDestroy, ViewChild, computed, inject, signal
 } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { Toolkit } from './toolkit/toolkit';
 
 type Theme = 'dark' | 'light';
 type Lang = 'th' | 'en';
@@ -33,35 +34,8 @@ const THEME_CANVAS = {
 const SUN = ['M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10Z', 'M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4'];
 const MOON = ['M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z'];
 
-/* Lucide paths at stroke-width 1.5 — code, server, database, smartphone,
-   cpu, memory, wrench, clipboard-check. */
-const SKILL_ICONS: string[][] = [
-  ['M16 18l6-6-6-6', 'M8 6l-6 6 6 6'],
-  ['M4 4h16v6H4z', 'M4 14h16v6H4z', 'M8 7h.01', 'M8 17h.01'],
-  ['M3 5c0-1.66 4.03-3 9-3s9 1.34 9 3-4.03 3-9 3-9-1.34-9-3Z', 'M3 5v7c0 1.66 4.03 3 9 3s9-1.34 9-3V5', 'M3 12v7c0 1.66 4.03 3 9 3s9-1.34 9-3v-7'],
-  ['M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z', 'M11 18h2'],
-  ['M6 6h12v12H6z', 'M9 2v3', 'M15 2v3', 'M9 19v3', 'M15 19v3', 'M2 9h3', 'M2 15h3', 'M19 9h3', 'M19 15h3'],
-  ['M4 8h16v8H4z', 'M8 8V5', 'M16 8V5', 'M8 19v-3', 'M16 19v-3'],
-  ['M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.4 6.4a2 2 0 0 1-2.8-2.8l6.4-6.4a6 6 0 0 1 7.9-7.9Z'],
-  ['M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2', 'M9 2h6v4H9z', 'm9 14 2 2 4-4']
-];
-
-/* Real brand marks (Simple Icons, CC0) for the specific tools named in each
-   skill card — index-aligned with SKILL_ICONS. Left empty where the tool has
-   no recognizable logo (FPGA/SoC, ISO 29110). */
-const SKILL_LOGOS: string[][] = [
-  ['html5', 'css3', 'javascript', 'react'],
-  ['nodejs', 'python', 'php', 'express'],
-  ['mysql', 'mongodb', 'postgresql', 'supabase'],
-  ['react', 'expo'],
-  ['espressif', 'arduino'],
-  [],
-  ['git', 'figma'],
-  []
-];
-
 const PROJECT_ICONS = {
-  database: SKILL_ICONS[2],
+  database: ['M3 5c0-1.66 4.03-3 9-3s9 1.34 9 3-4.03 3-9 3-9-1.34-9-3Z', 'M3 5v7c0 1.66 4.03 3 9 3s9-1.34 9-3V5', 'M3 12v7c0 1.66 4.03 3 9 3s9-1.34 9-3v-7'],
   doc: ['M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z', 'M15 2v5h5', 'M8 12h8', 'M8 16h8'],
   network: ['M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Z', 'M2 12h20', 'M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10Z']
 };
@@ -80,7 +54,7 @@ const CERT_IMAGES = ['aws-academy-graduate-generative-ai-foundations-trai.png', 
 
 const COPY = {
   th: {
-    'nav.about': 'เกี่ยวกับ', 'nav.education': 'การศึกษา', 'nav.skills': 'ทักษะ',
+    'nav.about': 'เกี่ยวกับ', 'nav.education': 'การศึกษา', 'nav.toolkit': 'ทักษะ',
     'nav.projects': 'ผลงาน', 'nav.certificates': 'เกียรติบัตร', 'nav.github': 'GitHub', 'nav.contact': 'ติดต่อ',
     'gh.title': 'GitHub', 'gh.kicker': 'อัปเดตสดจาก GitHub API',
     'gh.loading': 'กำลังโหลดข้อมูลจาก GitHub…',
@@ -96,17 +70,23 @@ const COPY = {
     'about.p2': 'มีประสบการณ์ในการพัฒนาทั้ง Web, Mobile Application, IoT และการออกแบบระบบ Hardware เช่น ESP32, FPGA พร้อมทั้งการจัดการ Database',
     'about.p3': 'สนใจการเรียนรู้สิ่งใหม่ๆ และพร้อมเปิดรับโอกาสในการทำงานร่วมกับทีม เพื่อพัฒนาทักษะและสร้างผลงานที่มีคุณภาพ',
     'edu.title': 'การศึกษา', 'edu.school': 'สถาบัน', 'edu.degree': 'วุฒิ / แผนการเรียน', 'edu.period': 'ช่วงเวลา',
-    'skills.title': 'ทักษะ', 'proj.title': 'ผลงาน', 'cert.title': 'เกียรติบัตร',
+    'proj.title': 'ผลงาน', 'cert.title': 'เกียรติบัตร',
     'proj.roleLabel': 'หน้าที่', 'proj.openDoc': 'ดูเอกสาร',
     'proj.searchPlaceholder': 'ค้นหาผลงาน เช่น ESP32, IoT, React',
     'proj.clear': 'ล้าง', 'proj.noResults': 'ไม่พบผลงานที่ตรงกับคำค้นหา',
     'cert.viewFull': 'ดูภาพเต็ม',
-    'contact.title': 'สนใจร่วมงาน ติดต่อผมได้เลย',
-    'contact.desc': 'เปิดรับโอกาสฝึกงานและร่วมงานด้านพัฒนาซอฟต์แวร์ IoT และระบบฐานข้อมูล',
+    'contact.kicker': 'ติดต่อผม', 'contact.title': 'มาร่วมงานกันครับ',
+    'contact.desc': 'เปิดรับโอกาสฝึกงานและร่วมงานด้านพัฒนาซอฟต์แวร์ IoT และระบบฐานข้อมูล สนใจร่วมงานหรือมีโปรเจกต์ที่อยากคุย ติดต่อผมได้ตามช่องทางด้านล่าง',
+    'contact.info': 'ข้อมูลติดต่อ', 'contact.email': 'อีเมล', 'contact.phone': 'โทรศัพท์', 'contact.location': 'ที่อยู่',
+    'contact.locationValue': 'กรุงเทพฯ ประเทศไทย', 'contact.social': 'โซเชียล',
+    'contact.form': 'ส่งข้อความ', 'contact.formName': 'ชื่อของคุณ', 'contact.formEmail': 'อีเมลของคุณ',
+    'contact.formMessage': 'ข้อความ…', 'contact.send': 'ส่งข้อความ', 'contact.resume': 'ดาวน์โหลดเรซูเม่',
+    'contact.sending': 'กำลังส่ง…', 'contact.sent': 'ส่งข้อความเรียบร้อยแล้ว ขอบคุณครับ — ผมจะติดต่อกลับโดยเร็ว',
+    'contact.failed': 'ส่งไม่สำเร็จ ลองใหม่อีกครั้ง หรือ', 'contact.failedLink': 'ส่งผ่านแอปอีเมลแทน',
     'footer': 'Portfolio — วิศวกรรมคอมพิวเตอร์ มหาวิทยาลัยศรีปทุม'
   },
   en: {
-    'nav.about': 'About', 'nav.education': 'Education', 'nav.skills': 'Skills',
+    'nav.about': 'About', 'nav.education': 'Education', 'nav.toolkit': 'Skills',
     'nav.projects': 'Projects', 'nav.certificates': 'Certificates', 'nav.github': 'GitHub', 'nav.contact': 'Contact',
     'gh.title': 'GitHub', 'gh.kicker': 'Live from the GitHub API',
     'gh.loading': 'Loading from GitHub…',
@@ -122,13 +102,19 @@ const COPY = {
     'about.p2': 'Experienced in developing Web, Mobile Applications, IoT, and Hardware design such as ESP32, FPGA, along with Database management.',
     'about.p3': 'Always eager to learn new things and open to opportunities to work with a team to develop skills and produce quality work.',
     'edu.title': 'Education', 'edu.school': 'Institution', 'edu.degree': 'Degree / Program', 'edu.period': 'Period',
-    'skills.title': 'Skills', 'proj.title': 'Projects', 'cert.title': 'Certificates',
+    'proj.title': 'Projects', 'cert.title': 'Certificates',
     'proj.roleLabel': 'Role', 'proj.openDoc': 'Open document',
     'proj.searchPlaceholder': 'Search projects — ESP32, IoT, React…',
     'proj.clear': 'Clear', 'proj.noResults': 'No projects match your search',
     'cert.viewFull': 'View full',
-    'contact.title': 'Interested in collaborating? Reach out',
-    'contact.desc': 'Open to internships and collaboration in software development, IoT and database systems.',
+    'contact.kicker': 'Get in touch', 'contact.title': "Let's work together",
+    'contact.desc': 'Open to internships and collaboration in software development, IoT and database systems. Have a project in mind? Reach out through the channels below.',
+    'contact.info': 'Contact info', 'contact.email': 'Email', 'contact.phone': 'Phone', 'contact.location': 'Location',
+    'contact.locationValue': 'Bangkok, Thailand', 'contact.social': 'Social profiles',
+    'contact.form': 'Send a message', 'contact.formName': 'Your name', 'contact.formEmail': 'Your email',
+    'contact.formMessage': 'Your message…', 'contact.send': 'Send message', 'contact.resume': 'Get my resume',
+    'contact.sending': 'Sending…', 'contact.sent': "Message sent — thanks! I'll get back to you soon.",
+    'contact.failed': "Couldn't send. Try again, or", 'contact.failedLink': 'use your email app instead',
     'footer': 'Portfolio — Computer Engineering, Sripatum University'
   }
 } as const;
@@ -140,12 +126,6 @@ const CONTENT = {
     education: [
       { school: 'มหาวิทยาลัยศรีปทุม', degree: 'ปริญญาตรี คณะเทคโนโลยี', major: 'สาขาวิศวกรรมคอมพิวเตอร์', year: '2023 - ปัจจุบัน' },
       { school: 'โรงเรียนดรุณาราชบุรี', degree: 'มัธยมศึกษาตอนปลาย', major: 'แผนการเรียน วิทย์ - คณิต', year: '2020 - 2022' }
-    ],
-    skills: [
-      ['Frontend', 'HTML, CSS, JavaScript, React'], ['Backend', 'Node.js, Python, PHP, Express'],
-      ['Database', 'MySQL, MongoDB, PostgreSQL, Supabase'], ['Mobile', 'React Native, Expo'],
-      ['IoT & Hardware', 'ESP32, Arduino, ออกแบบเซ็นเซอร์'], ['FPGA / SoC', 'Xilinx, VHDL, Verilog, CPU 8-bit'],
-      ['เครื่องมือ', 'Git, VS Code, Figma, Xilinx ISE, Wecon PLC Editor, PIStudio'], ['มาตรฐาน', 'การจัดทำเอกสาร ISO 29110']
     ],
     projects: [
       { title: 'Application V-Fresh', desc: 'แอปพลิเคชันสำหรับสั่งซื้อผักผลไม้สดจากฟาร์มถึงบ้านเพื่อเกษตรกร', role: 'ทำหน้าแอปฝั่งของ Seller และระบบ Live โดย Agora พร้อมจัดการ Database ด้วย Supabase' },
@@ -175,12 +155,6 @@ const CONTENT = {
     education: [
       { school: 'Sripatum University', degree: "Bachelor's Degree, School of Technology", major: 'Computer Engineering', year: '2023 - Present' },
       { school: 'Darunaratchaburi School', degree: 'High School', major: 'Science - Mathematics Program', year: '2020 - 2022' }
-    ],
-    skills: [
-      ['Frontend', 'HTML, CSS, JavaScript, React'], ['Backend', 'Node.js, Python, PHP, Express'],
-      ['Database', 'MySQL, MongoDB, PostgreSQL, Supabase'], ['Mobile', 'React Native, Expo'],
-      ['IoT & Hardware', 'ESP32, Arduino, Sensor Design'], ['FPGA / SoC', 'Xilinx, VHDL, Verilog, CPU 8-bit'],
-      ['Tools', 'Git, VS Code, Figma, Xilinx ISE, Wecon PLC Editor, PIStudio'], ['Standard', 'ISO 29110 Document Management']
     ],
     projects: [
       { title: 'V-Fresh Application', desc: 'Mobile app for ordering fresh produce from farm to home, supporting local farmers', role: 'Developed the Seller-side interface and Live streaming feature with Agora, managed Database with Supabase' },
@@ -246,9 +220,31 @@ const LANG_COLOR: Record<string, string> = {
   Dart: '#00B4AB', Shell: '#89e051', Java: '#b07219', Verilog: '#b2b7f8', VHDL: '#adb2cb'
 };
 
+const CONTACT_EMAIL = 'wongsakon20172547@gmail.com';
+/* Drop the PDF into public/ under this name (or swap in a Drive link). */
+const RESUME_URL = 'resume.pdf';
+/* Web3Forms public access key — safe to ship in client code; it can only
+   deliver submissions to the inbox registered on web3forms.com. */
+const WEB3FORMS_KEY = 'b4e5dcdf-2835-4670-9b80-3bd73e3de513';
+
+/* Lucide mail, phone, map-pin */
+const CONTACT_ICONS = {
+  mail: ['M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z', 'm22 6-10 7L2 6'],
+  phone: ['M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2Z'],
+  pin: ['M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z', 'M12 7a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z']
+};
+
+/* Lucide github, linkedin, facebook, instagram */
+const SOCIALS = [
+  { name: 'GitHub', href: 'https://github.com/Few-zzz', icon: ['M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4', 'M9 18c-4.51 2-5-2-7-2'] },
+  { name: 'LinkedIn', href: 'https://www.linkedin.com/in/wongsakon-sritongted-791a85290', icon: ['M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6Z', 'M2 9h4v12H2z', 'M4 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z'] },
+  { name: 'Facebook', href: 'https://web.facebook.com/wongsakon.sritongted', icon: ['M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z'] },
+  { name: 'Instagram', href: 'https://www.instagram.com/z__few__z', icon: ['M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Z', 'M16 11.4A4 4 0 1 1 12.6 8 4 4 0 0 1 16 11.4Z', 'M17.5 6.5h.01'] }
+];
+
 @Component({
   selector: 'app-root',
-  imports: [],
+  imports: [Toolkit],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
@@ -284,14 +280,17 @@ export class App implements AfterViewInit, OnDestroy {
   protected readonly profile = signal<GhProfile | null>(null);
   protected readonly reposState = signal<'loading' | 'ready' | 'error'>('loading');
 
-  protected readonly channels = [
-    { k: 'Email', v: 'wongsakon20172547@gmail.com', href: 'mailto:wongsakon20172547@gmail.com' },
-    { k: 'Tel', v: '063-3130850', href: '' },
-    { k: 'GitHub', v: 'github.com/Few-zzz ↗', href: 'https://github.com/Few-zzz' },
-    { k: 'LinkedIn', v: 'wongsakon-sritongted ↗', href: 'https://www.linkedin.com/in/wongsakon-sritongted-791a85290' },
-    { k: 'Facebook', v: 'wongsakon.sritongted ↗', href: 'https://web.facebook.com/wongsakon.sritongted' },
-    { k: 'Instagram', v: '@z__few__z ↗', href: 'https://www.instagram.com/z__few__z' }
-  ];
+  protected readonly resumeUrl = RESUME_URL;
+
+  protected readonly contactItems = computed(() => [
+    { label: this.t('contact.email'), v: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}`, icon: CONTACT_ICONS.mail },
+    { label: this.t('contact.phone'), v: '063-313-0850', href: 'tel:+66633130850', icon: CONTACT_ICONS.phone },
+    { label: this.t('contact.location'), v: this.t('contact.locationValue'), href: '', icon: CONTACT_ICONS.pin }
+  ]);
+
+  protected readonly socials = SOCIALS;
+  protected readonly contactState = signal<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  protected readonly mailtoFallback = signal(`mailto:${CONTACT_EMAIL}`);
 
   protected readonly themeIcon = computed(() => (this.theme() === 'dark' ? SUN : MOON));
 
@@ -308,10 +307,6 @@ export class App implements AfterViewInit, OnDestroy {
   );
 
   protected readonly education = computed(() => CONTENT[this.lang()].education);
-
-  protected readonly skills = computed(() =>
-    CONTENT[this.lang()].skills.map(([name, desc], i) => ({ name, desc, icon: SKILL_ICONS[i], logos: SKILL_LOGOS[i] }))
-  );
 
   protected readonly certificates = computed<Certificate[]>(() =>
     CONTENT[this.lang()].certificates.map((c, i) => ({ ...c, img: CERT_IMAGES[i] }))
@@ -338,6 +333,35 @@ export class App implements AfterViewInit, OnDestroy {
   }
 
   protected clearQuery(): void { this.query.set(''); }
+
+  /* Delivered by Web3Forms; on failure, offer a pre-filled mailto instead. */
+  protected async sendMessage(event: Event): Promise<void> {
+    event.preventDefault();
+    if (this.contactState() === 'sending') return;
+    const form = event.target as HTMLFormElement;
+    const data = new FormData(form);
+    if (data.get('botcheck')) return;
+    const name = String(data.get('name') ?? '').trim();
+    const email = String(data.get('email') ?? '').trim();
+    const message = String(data.get('message') ?? '').trim();
+    const subject = `Portfolio contact from ${name}`;
+    this.mailtoFallback.set(
+      `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(`${message}\n\n— ${name} (${email})`)}`
+    );
+    this.contactState.set('sending');
+    try {
+      const body = new FormData();
+      for (const [k, v] of Object.entries({ access_key: WEB3FORMS_KEY, subject, from_name: 'Portfolio', name, email, message })) body.append(k, v);
+      // FormData keeps this a CORS "simple" request — no preflight to fail.
+      const res = await fetch('https://api.web3forms.com/submit', { method: 'POST', headers: { Accept: 'application/json' }, body });
+      const json = await res.json().catch(() => null);
+      if (!res.ok || !json?.success) throw new Error(json?.message ?? res.statusText);
+      this.contactState.set('sent');
+      form.reset();
+    } catch {
+      this.contactState.set('error');
+    }
+  }
 
   protected openModal(cert: Certificate): void {
     this.modalImg.set(cert.img);

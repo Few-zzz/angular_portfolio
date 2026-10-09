@@ -9,7 +9,7 @@
     <nav class="head-nav">
       <a href="#about">{{ t('nav.about') }}</a>
       <a href="#education">{{ t('nav.education') }}</a>
-      <a href="#skills">{{ t('nav.skills') }}</a>
+      <a href="#toolkit">{{ t('nav.toolkit') }}</a>
       <a href="#projects">{{ t('nav.projects') }}</a>
       <a href="#certificates">{{ t('nav.certificates') }}</a>
       <a href="#github">{{ t('nav.github') }}</a>
@@ -121,30 +121,8 @@
   </table>
 </section>
 
-<section class="sec" id="skills">
-  <h2 class="sec-title">{{ t('skills.title') }}</h2>
-  <div class="skill-grid">
-    @for (s of skills(); track s.name) {
-      <div class="skill-cell">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="skill-ic">
-          @for (d of s.icon; track d) {
-            <path [attr.d]="d" />
-          }
-        </svg>
-        <h3>{{ s.name }}</h3>
-        <p>{{ s.desc }}</p>
-        @if (s.logos.length) {
-          <div class="skill-logos">
-            @for (logo of s.logos; track logo) {
-              <span class="skill-logo" [class.on-dark]="logo === 'express' || logo === 'expo'">
-                <img [src]="'logos/' + logo + '.svg'" [alt]="logo" loading="lazy" />
-              </span>
-            }
-          </div>
-        }
-      </div>
-    }
-  </div>
+<section class="sec" id="toolkit">
+  <app-toolkit [lang]="lang()" [projects]="projects()" />
 </section>
 
 <section class="sec" id="projects">
@@ -312,24 +290,71 @@
 }
 
 <section class="field" id="contact">
-  <div class="field-grid">
-    <div>
-      <p class="kicker on-field">{{ t('nav.contact') }}</p>
+  <div class="field-inner">
+    <header class="field-head">
+      <p class="kicker on-field">{{ t('contact.kicker') }}</p>
       <h2 class="field-title">{{ t('contact.title') }}</h2>
       <p class="field-desc">{{ t('contact.desc') }}</p>
-    </div>
-    <dl class="channels">
-      @for (ch of channels; track ch.k) {
-        <dt>{{ ch.k }}</dt>
-        <dd>
-          @if (ch.href) {
-            <a [href]="ch.href" target="_blank" rel="noopener">{{ ch.v }}</a>
-          } @else {
-            <span>{{ ch.v }}</span>
+    </header>
+
+    <div class="contact-card blueprint">
+      <div class="contact-info">
+        <h3 class="contact-h">{{ t('contact.info') }}</h3>
+        <ul class="contact-list">
+          @for (c of contactItems(); track c.label) {
+            <li>
+              <span class="contact-ic">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  @for (d of c.icon; track d) { <path [attr.d]="d" /> }
+                </svg>
+              </span>
+              <div>
+                <span class="contact-label">{{ c.label }}</span>
+                @if (c.href) {
+                  <a class="contact-value" [href]="c.href">{{ c.v }}</a>
+                } @else {
+                  <span class="contact-value">{{ c.v }}</span>
+                }
+              </div>
+            </li>
           }
-        </dd>
-      }
-    </dl>
+        </ul>
+
+        <p class="contact-label">{{ t('contact.social') }}</p>
+        <div class="social-row">
+          @for (s of socials; track s.name) {
+            <a class="social" [href]="s.href" target="_blank" rel="noopener" [attr.aria-label]="s.name" [title]="s.name">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                @for (d of s.icon; track d) { <path [attr.d]="d" /> }
+              </svg>
+            </a>
+          }
+        </div>
+      </div>
+
+      <form class="contact-form" (submit)="sendMessage($event)">
+        <h3 class="contact-h">{{ t('contact.form') }}</h3>
+        <input class="field-input" name="name" type="text" required [placeholder]="t('contact.formName')" [attr.aria-label]="t('contact.formName')" />
+        <input class="field-input" name="email" type="email" required [placeholder]="t('contact.formEmail')" [attr.aria-label]="t('contact.formEmail')" />
+        <textarea class="field-input" name="message" rows="5" required [placeholder]="t('contact.formMessage')" [attr.aria-label]="t('contact.formMessage')"></textarea>
+        <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <button type="submit" class="btn field-btn send-btn" [disabled]="contactState() === 'sending'">
+          {{ contactState() === 'sending' ? t('contact.sending') : t('contact.send') }}
+        </button>
+        <a class="btn field-btn resume-btn" [href]="resumeUrl" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M15 2v5h5" /><path d="M12 11v6" /><path d="m9 14 3 3 3-3" />
+          </svg>
+          {{ t('contact.resume') }}
+        </a>
+        @if (contactState() === 'sent') {
+          <p class="contact-note ok" role="status">✓ {{ t('contact.sent') }}</p>
+        } @else if (contactState() === 'error') {
+          <p class="contact-note err" role="alert">{{ t('contact.failed') }} <a [href]="mailtoFallback()">{{ t('contact.failedLink') }}</a></p>
+        }
+      </form>
+      <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+    </div>
   </div>
 </section>
 
