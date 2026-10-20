@@ -111,6 +111,7 @@
   position: relative;
   min-height: 470px;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   place-items: center;
   perspective: 1800px;
   touch-action: manipulation;
@@ -213,7 +214,10 @@
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.18);
 }
 
-.cap:hover { --h: calc(var(--d) + 5px); }
+/* Touch screens keep :hover stuck after a tap, so only lift on real hover. */
+@media (hover: hover) {
+  .cap:hover { --h: calc(var(--d) + 5px); }
+}
 .cap.on .cap-top {
   box-shadow:
     inset 0 0 0 2px rgba(255, 255, 255, 0.85),
@@ -227,8 +231,29 @@
   .tk { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'head' 'stage' 'card'; gap: var(--sp-6); }
   .tk-stage { --s: 0.78; min-height: 380px; margin: 0 -16px; overflow: hidden; }
 }
+/* Phones: scale() leaves the 500px layout box behind, which pushed the board
+   off-center and clipped it. Size the caps from the viewport instead. */
 @media (max-width: 560px) {
-  .tk-stage { --s: 0.54; --rx: 46deg; --rz: 8deg; min-height: 230px; }
+  .tk-stage {
+    --s: 1;
+    --g: 5px;
+    --bp: 10px;
+    --u: min(52px, calc((100vw - 2 * var(--bp) - 6 * var(--g) - 44px) / 7));
+    --d: 9px;
+    --pd: 12px;
+    --rx: 40deg;
+    --rz: 5deg;
+    min-height: calc(4 * var(--u) + 110px);
+    margin: 0 -16px;
+  }
+  .tk-board { padding: var(--bp); border-radius: 5px; box-shadow: 14px 22px 30px rgba(0, 0, 0, 0.3); }
+  .cap-top { border-radius: 6px; }
+  .cap-front { border-radius: 0 0 4px 4px; }
+  .cap-right { border-radius: 0 4px 4px 0; }
+  .cap-key { top: 3px; left: 4px; font-size: 7px; }
+  .cap-logo { inset: 28%; }
+  .cap-text { font-size: 11px; letter-spacing: 0; }
+  .cap.down { --h: 2px; }
   .tk-card h3 { font-size: 26px; }
 }
 
