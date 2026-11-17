@@ -199,13 +199,7 @@
     @for (c of certificates(); track c.img) {
       <figure class="cert">
         <button type="button" class="cert-shot blueprint" [title]="t('cert.viewFull')" (click)="openModal(c)">
-          @if (isPdf(c.img)) {
-            <object class="cert-pdf" [attr.data]="c.img + '#toolbar=0&navpanes=0&scrollbar=0&view=Fit'" type="application/pdf" [attr.aria-label]="c.title" tabindex="-1">
-              <span class="cert-pdf-fallback">PDF<small>{{ c.title }}</small></span>
-            </object>
-          } @else {
-            <img [src]="c.img" [alt]="c.title" />
-          }
+          <img [src]="c.img" [alt]="c.title" />
           <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
         </button>
         <figcaption>

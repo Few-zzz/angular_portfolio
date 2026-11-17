@@ -435,9 +435,6 @@ figure { margin: 0; }
 .cert-shot { padding: 0; background: #fff; cursor: zoom-in; display: block; width: 100%; }
 .cert-shot:hover { border-color: var(--accent); }
 .cert-shot img { width: 100%; aspect-ratio: 4 / 3; object-fit: contain; background: #fff; padding: var(--sp-3); }
-.cert-pdf { display: block; width: 100%; aspect-ratio: 4 / 3; border: 0; background: #fff; pointer-events: none; }
-.cert-pdf-fallback { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; width: 100%; height: 100%; background: #d97757; color: #fff; font-size: 32px; font-weight: 700; letter-spacing: .1em; text-align: center; padding: var(--sp-3); }
-.cert-pdf-fallback small { font-size: 14px; font-weight: 500; letter-spacing: 0; }
 .cert figcaption h3 { font-size: 19px; margin-bottom: 4px; }
 .cert figcaption p { font-size: 13px; }
 .cert-meta {

@@ -50,7 +50,7 @@ const PROJECT_META = [
   { no: 'PRJ 07', kind: 'Network Research', icon: PROJECT_ICONS.network, pdf: 'https://drive.google.com/file/d/1fjkqMTIZZQc9PaTKvGWuKdNiFa65fEhf/view?usp=sharing', tags: ['Network', 'Active-Active', 'High Availability', 'SA'] }
 ];
 
-const CERT_IMAGES = ['claude-academy-badge-claude-101.pdf', 'aws-academy-graduate-generative-ai-foundations-trai.png', 'HCIA-IoT V3.0 Course.png', 'cert-aws.png', 'cert-teacher.png', 'cert-aws-full.png', 'cert-research.png', 'cert-datascience.png', 'cert-cloudbased.png', 'cert-logistics.png', 'cert-business.png'];
+const CERT_IMAGES = ['claude-academy-badge-claude-101.png', 'aws-academy-graduate-generative-ai-foundations-trai.png', 'HCIA-IoT V3.0 Course.png', 'cert-aws.png', 'cert-teacher.png', 'cert-aws-full.png', 'cert-research.png', 'cert-datascience.png', 'cert-cloudbased.png', 'cert-logistics.png', 'cert-business.png'];
 
 const COPY = {
   th: {
@@ -365,13 +365,7 @@ export class App implements AfterViewInit, OnDestroy {
     }
   }
 
-  protected isPdf(file: string): boolean { return file.toLowerCase().endsWith('.pdf'); }
-
   protected openModal(cert: Certificate): void {
-    if (this.isPdf(cert.img)) {
-      window.open(cert.img, '_blank', 'noopener');
-      return;
-    }
     this.modalImg.set(cert.img);
     this.modalAlt.set(cert.title);
   }
