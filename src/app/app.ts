@@ -50,7 +50,7 @@ const PROJECT_META = [
   { no: 'PRJ 07', kind: 'Network Research', icon: PROJECT_ICONS.network, pdf: 'https://drive.google.com/file/d/1fjkqMTIZZQc9PaTKvGWuKdNiFa65fEhf/view?usp=sharing', tags: ['Network', 'Active-Active', 'High Availability', 'SA'] }
 ];
 
-const CERT_IMAGES = ['aws-academy-graduate-generative-ai-foundations-trai.png', 'HCIA-IoT V3.0 Course.png', 'cert-aws.png', 'cert-teacher.png', 'cert-aws-full.png', 'cert-research.png', 'cert-datascience.png', 'cert-cloudbased.png', 'cert-logistics.png', 'cert-business.png'];
+const CERT_IMAGES = ['claude-academy-badge-claude-101.pdf', 'aws-academy-graduate-generative-ai-foundations-trai.png', 'HCIA-IoT V3.0 Course.png', 'cert-aws.png', 'cert-teacher.png', 'cert-aws-full.png', 'cert-research.png', 'cert-datascience.png', 'cert-cloudbased.png', 'cert-logistics.png', 'cert-business.png'];
 
 const COPY = {
   th: {
@@ -137,6 +137,7 @@ const CONTENT = {
       { title: 'วิจัยการออกแบบ Network Active-Active', desc: 'งานวิจัยการออกแบบระบบเครือข่ายแบบ Active-Active เพื่อเพิ่มความพร้อมใช้งาน (High Availability) และกระจายโหลดอย่างมีประสิทธิภาพ', role: 'System Analyst (SA) ออกแบบ Diagram ของระบบ' }
     ],
     certificates: [
+      { title: 'Claude 101 - Course Completion Badge', org: 'Claude Academy (Anthropic)', date: '17 พ.ย. 2026' },
       { title: 'AWS Academy Graduate - Generative AI Foundations', org: 'AWS Academy', date: '18 ก.ย. 2026' },
       { title: 'HCIA-IoT V3.0 Course', org: 'Huawei ICT Academy', date: '9 ก.ย. 2026' },
       { title: 'AWS Academy - Machine Learning Foundations', org: 'AWS Academy (20 ชั่วโมง)', date: '16 ก.พ. 2026' },
@@ -166,6 +167,7 @@ const CONTENT = {
       { title: 'Active-Active Network Design Research', desc: 'Research on designing Active-Active network architecture to improve high availability and efficiently distribute load', role: 'System Analyst (SA) — designed the system diagram' }
     ],
     certificates: [
+      { title: 'Claude 101 - Course Completion Badge', org: 'Claude Academy (Anthropic)', date: 'Nov 17, 2026' },
       { title: 'AWS Academy Graduate - Generative AI Foundations', org: 'AWS Academy', date: 'Sep 18, 2026' },
       { title: 'HCIA-IoT V3.0 Course', org: 'Huawei ICT Academy', date: 'Sep 9, 2026' },
       { title: 'AWS Academy - Machine Learning Foundations', org: 'AWS Academy (20 Hours)', date: 'Feb 16, 2026' },
@@ -363,7 +365,13 @@ export class App implements AfterViewInit, OnDestroy {
     }
   }
 
+  protected isPdf(file: string): boolean { return file.toLowerCase().endsWith('.pdf'); }
+
   protected openModal(cert: Certificate): void {
+    if (this.isPdf(cert.img)) {
+      window.open(cert.img, '_blank', 'noopener');
+      return;
+    }
     this.modalImg.set(cert.img);
     this.modalAlt.set(cert.title);
   }
